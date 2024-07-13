@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/lalit-dahiya/MyServiceCatalog/api/models"
 	"github.com/lalit-dahiya/MyServiceCatalog/pkg/services"
+	"log"
 	"net/http"
 )
 
@@ -33,9 +35,10 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 	var newUser models.User
 	err := c.Bind(&newUser)
 	if err != nil {
+		log.Print(fmt.Errorf("error creating user: %w", err))
 		return echo.ErrBadRequest
 	}
-	// validations
+	//TODO validations
 	err = h.userInterface.CreateUser(newUser)
 	if err != nil {
 		return echo.ErrBadRequest
@@ -51,7 +54,7 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 	if err != nil {
 		return echo.ErrBadRequest
 	}
-	// validations
+	//TODO validations
 	err = h.userInterface.UpdateUser(userId, updatedUser)
 	if err != nil {
 		return echo.ErrBadRequest

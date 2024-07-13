@@ -44,7 +44,7 @@ func (h *ServiceHandler) CreateService(c echo.Context) error {
 	if err != nil {
 		return echo.ErrBadRequest
 	}
-	// validations
+	//TODO validations
 	err = h.serviceInterface.CreateService(newService)
 	if err != nil {
 		return echo.ErrBadRequest
@@ -60,7 +60,7 @@ func (h *ServiceHandler) UpdateService(c echo.Context) error {
 	if err != nil {
 		return echo.ErrBadRequest
 	}
-	// validations
+	//TODO validations
 	err = h.serviceInterface.UpdateService(serviceId, updatedService)
 	if err != nil {
 		return echo.ErrBadRequest
