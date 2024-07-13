@@ -3,20 +3,28 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/lalit-dahiya/MyServiceCatalog/api/models"
+	"github.com/lalit-dahiya/MyServiceCatalog/pkg/services"
 	"net/http"
 )
 
 type ServiceHandler struct {
-	serviceInterface models.ServiceInterface
+	serviceInterface services.ServiceInterface
+}
+
+// NewServiceHandler creates a new service handler with the provided ServiceInterface
+func NewServiceHandler(serviceInterface services.ServiceInterface) *ServiceHandler {
+	return &ServiceHandler{
+		serviceInterface: serviceInterface,
+	}
 }
 
 // GetServices retrieves the list of services
 func (h *ServiceHandler) GetServices(c echo.Context) error {
-	services, err := h.serviceInterface.GetServices()
+	svc, err := h.serviceInterface.GetServices()
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, services)
+	return c.JSON(http.StatusOK, svc)
 }
 
 // GetService retrieves a specific service by id

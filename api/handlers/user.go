@@ -3,20 +3,19 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/lalit-dahiya/MyServiceCatalog/api/models"
+	"github.com/lalit-dahiya/MyServiceCatalog/pkg/services"
 	"net/http"
 )
 
 type UserHandler struct {
-	userInterface models.UserInterface
+	userInterface services.UserInterface
 }
 
-// GetUsers retrieves the list of users
-func (h *UserHandler) GetUsers(c echo.Context) error {
-	users, err := h.userInterface.GetUsers()
-	if err != nil {
-		return err
+// NewUserHandler creates a new user handler with the provided UserInterface
+func NewUserHandler(userService services.UserInterface) *UserHandler {
+	return &UserHandler{
+		userInterface: userService,
 	}
-	return c.JSON(http.StatusOK, users)
 }
 
 // GetUser retrieves a specific user by id
