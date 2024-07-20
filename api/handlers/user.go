@@ -59,7 +59,7 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 	if err != nil {
 		return echo.ErrBadRequest
 	}
-	return echo.ErrNotFound
+	return nil
 }
 
 // DeleteUser deletes a user

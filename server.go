@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/lalit-dahiya/MyServiceCatalog/api/handlers"
 	"github.com/lalit-dahiya/MyServiceCatalog/api/models"
+	"github.com/lalit-dahiya/MyServiceCatalog/pkg/config"
 	"github.com/lalit-dahiya/MyServiceCatalog/pkg/services"
 	"github.com/lalit-dahiya/MyServiceCatalog/pkg/services/db/nosql"
 	"github.com/lalit-dahiya/MyServiceCatalog/pkg/services/inmemory"
@@ -18,19 +19,25 @@ import (
 func main() {
 	e := echo.New()
 
+	cfg, err := config.LoadConfig("./config.yaml")
+	if err != nil {
+		panic(err)
+	}
+
 	var userService services.UserInterface
 	var serviceService services.ServiceInterface
+	var serviceVersionService services.ServiceVersionInterface
 
 	ctx := context.Background()
-	useMongoDb := false // Ideally fetch from runtime config
-	if useMongoDb {
+	if cfg.Database.UseMongoDb {
 		// Initialize mongoDb service
 		bsonOpts := &options.BSONOptions{
 			UseJSONStructTags: true,
 			NilMapAsEmpty:     true,
 			NilSliceAsEmpty:   true,
 		}
-		clientOpts := options.Client().ApplyURI("mongodb:// localhost:27000").SetBSONOptions(bsonOpts)
+		uri := fmt.Sprintf("mongodb://%s:%s", cfg.Database.Host, cfg.Database.Port)
+		clientOpts := options.Client().ApplyURI(uri).SetBSONOptions(bsonOpts)
 		mongoClient, err := mongo.Connect(ctx, clientOpts)
 		if err != nil {
 			panic(err)
@@ -41,13 +48,21 @@ func main() {
 			}
 		}()
 
-		userService, err = nosql.NewUserService(ctx, mongoClient, "MyServiceCatalog", "users")
+		userService, err = nosql.NewUserService(ctx, mongoClient, cfg.Database.Name, cfg.Database.UserCol)
 		if err != nil {
+			fmt.Println("error creating user service : ", err)
 			panic(err) // Handle connection or collection creation error
 		}
 
-		serviceService, err = nosql.NewServiceService(ctx, mongoClient, "MyServiceCatalog", "services")
+		serviceVersionService, err = nosql.NewServiceVersionService(ctx, mongoClient, cfg.Database.Name, cfg.Database.VersionCol)
 		if err != nil {
+			fmt.Println("error creating version service : ", err)
+			panic(err) // Handle connection or collection creation error
+		}
+
+		serviceService, err = nosql.NewServiceService(ctx, mongoClient, cfg.Database.Name, cfg.Database.ServiceCol, cfg.Database.VersionCol)
+		if err != nil {
+			fmt.Println("error creating service service : ", err)
 			panic(err) // Handle connection or collection creation error
 		}
 	} else {
@@ -69,6 +84,7 @@ func main() {
 	// Create handlers with the initialized services
 	userHandler := handlers.NewUserHandler(userService)
 	serviceHandler := handlers.NewServiceHandler(serviceService)
+	versionHandler := handlers.NewServiceVersionHandler(serviceVersionService)
 
 	// Register user API handlers
 	e.GET("/users/:username", userHandler.GetUser)
@@ -78,13 +94,21 @@ func main() {
 
 	// Register service API handlers
 	e.GET("/services", serviceHandler.GetServices)
+	e.GET("/services/search/:search", serviceHandler.SearchServices)
 	e.GET("/services/:id", serviceHandler.GetService)
 	e.POST("/services", serviceHandler.CreateService)
 	e.PUT("/services/:id", serviceHandler.UpdateService)
 	e.DELETE("/services/:id", serviceHandler.DeleteService)
 
+	// Register service version API handlers
+	e.GET("/versions", versionHandler.GetServiceVersions)
+	e.GET("/versions/:id", versionHandler.GetServiceVersion)
+	e.POST("/versions", versionHandler.CreateServiceVersion)
+	e.PUT("/versions/:id", versionHandler.UpdateServiceVersion)
+	e.DELETE("/versions/:id", versionHandler.DeleteService)
+
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Server.Port)))
 }

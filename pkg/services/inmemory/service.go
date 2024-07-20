@@ -3,14 +3,20 @@ package inmemory
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/lalit-dahiya/MyServiceCatalog/api/models"
+	"github.com/lalit-dahiya/MyServiceCatalog/pkg/utils"
 )
 
 type Service struct {
 	Services []models.Service
 }
 
-func (s *Service) GetServices() ([]models.Service, error) {
-	return s.Services, nil
+func (s *Service) GetServices() ([]models.ServiceSummary, error) {
+	var summaries []models.ServiceSummary
+	for _, service := range s.Services {
+		summary := utils.ConvertToSummary(service, 0)
+		summaries = append(summaries, summary)
+	}
+	return summaries, nil
 }
 
 func (s *Service) GetService(id string) (models.Service, error) {
@@ -20,6 +26,10 @@ func (s *Service) GetService(id string) (models.Service, error) {
 		}
 	}
 	return models.Service{}, echo.ErrNotFound
+}
+
+func (s *Service) SearchServices(id string) ([]models.Service, error) {
+	return nil, nil
 }
 
 func (s *Service) CreateService(service models.Service) error {
@@ -39,7 +49,7 @@ func (s *Service) UpdateService(id string, service models.Service) error {
 }
 
 func (s *Service) DeleteService(id string) error {
-	newServices := []models.Service{}
+	var newServices []models.Service
 	for _, service := range s.Services {
 		if service.ID != id {
 			newServices = append(newServices, service)

@@ -2,7 +2,10 @@ module github.com/lalit-dahiya/MyServiceCatalog
 
 go 1.20
 
-require github.com/labstack/echo/v4 v4.12.0
+require (
+	github.com/labstack/echo/v4 v4.12.0
+	gopkg.in/yaml.v3 v3.0.1
+)
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect

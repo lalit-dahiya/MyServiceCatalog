@@ -1,0 +1,10 @@
+server:
+  port: 8080
+database:
+  name: "MyServiceCatalog"
+  userCollectionName: "users"
+  serviceCollectionName: "services"
+  versionCollectionName: "versions"
+  useMongoDb: true
+  host: localhost
+  port: 27017
