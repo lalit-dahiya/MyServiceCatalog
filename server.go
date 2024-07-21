@@ -87,25 +87,25 @@ func main() {
 	versionHandler := handlers.NewServiceVersionHandler(serviceVersionService)
 
 	// Register user API handlers
-	e.GET("/users/:username", userHandler.GetUser)
-	e.POST("/users", userHandler.CreateUser)
-	e.PUT("/users/:username", userHandler.UpdateUser)
-	e.DELETE("/users/:username", userHandler.DeleteUser)
+	e.GET("/api/v1/users/:username", userHandler.GetUser)
+	e.POST("/api/v1/users", userHandler.CreateUser)
+	e.PUT("/api/v1/users/:username", userHandler.UpdateUser)
+	e.DELETE("/api/v1/users/:username", userHandler.DeleteUser)
 
 	// Register service API handlers
-	e.GET("/services", serviceHandler.GetServices)
-	e.GET("/services/search/:search", serviceHandler.SearchServices)
-	e.GET("/services/:id", serviceHandler.GetService)
-	e.POST("/services", serviceHandler.CreateService)
-	e.PUT("/services/:id", serviceHandler.UpdateService)
-	e.DELETE("/services/:id", serviceHandler.DeleteService)
+	e.GET("/api/v1/services", serviceHandler.GetServices)
+	e.GET("/api/v1/services/search/:search", serviceHandler.SearchServices)
+	e.GET("/api/v1/services/:id", serviceHandler.GetService)
+	e.POST("/api/v1/services", serviceHandler.CreateService)
+	e.PUT("/api/v1/services/:id", serviceHandler.UpdateService)
+	e.DELETE("/api/v1/services/:id", serviceHandler.DeleteService)
 
 	// Register service version API handlers
-	e.GET("/versions", versionHandler.GetServiceVersions)
-	e.GET("/versions/:id", versionHandler.GetServiceVersion)
-	e.POST("/versions", versionHandler.CreateServiceVersion)
-	e.PUT("/versions/:id", versionHandler.UpdateServiceVersion)
-	e.DELETE("/versions/:id", versionHandler.DeleteService)
+	e.GET("/api/v1/versions", versionHandler.GetServiceVersions)
+	e.GET("/api/v1/versions/:id", versionHandler.GetServiceVersion)
+	e.POST("/api/v1/versions", versionHandler.CreateServiceVersion)
+	e.PUT("/api/v1/versions/:id", versionHandler.UpdateServiceVersion)
+	e.DELETE("/api/v1/versions/:id", versionHandler.DeleteService)
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
